@@ -64,11 +64,15 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card
-        className="w-full max-w-5xl bg-black/10 border-2 border-foreground/5 py-16 px-8 md:py-20 md:px-12 lg:py-24 lg:px-16 mix-blend-overlay
+        className="w-full border-none max-w-5xl bg-black/10 mix-blend-overlay py-16 px-8 md:py-20 md:px-12 lg:py-20 lg:px-16
 "
+        style={{
+          boxShadow: "0 0 20px rgba(255, 255, 255, 0.05)",
+          borderRadius: "32px",
+        }}
       >
         <CardHeader>
-          <CardTitle className="text-3xl">Nice to see you again</CardTitle>
+          <CardTitle className="w-72 text-3xl">Nice to see you again</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
