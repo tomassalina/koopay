@@ -15,8 +15,8 @@ interface ChartData {
 export function DonutChart() {
   const [hoveredSegment, setHoveredSegment] = useState<number | null>(null);
 
-  const totalBalance = 23600;
-  const completedProjects = 18;
+  const totalBalance = 8000;
+  const completedProjects = 3;
 
   const data: ChartData[] = [
     {

@@ -102,7 +102,7 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold">Tus Proyectos</h2>
           <Badge variant="secondary" className="gap-1">
-            18
+            3
           </Badge>
         </div>
 
