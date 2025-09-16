@@ -97,7 +97,7 @@ export function useProjectCreation() {
         if (milestonesError) {
           console.error("Error creating milestones:", milestonesError);
           throw new Error(
-            `Error creating milestones: ${milestonesError.message}`
+            `Error creating milestones: ${milestonesError.message}`,
           );
         }
 
@@ -108,7 +108,7 @@ export function useProjectCreation() {
       if (data.freelancer_id) {
         console.log(
           "Creating project invitation for freelancer:",
-          data.freelancer_id
+          data.freelancer_id,
         );
 
         // Get freelancer email from their profile
@@ -122,7 +122,7 @@ export function useProjectCreation() {
         if (freelancerError) {
           console.error("Error fetching freelancer profile:", freelancerError);
           throw new Error(
-            `Error fetching freelancer profile: ${freelancerError.message}`
+            `Error fetching freelancer profile: ${freelancerError.message}`,
           );
         }
 
@@ -142,7 +142,7 @@ export function useProjectCreation() {
         if (invitationError) {
           console.error("Error creating project invitation:", invitationError);
           throw new Error(
-            `Error creating project invitation: ${invitationError.message}`
+            `Error creating project invitation: ${invitationError.message}`,
           );
         }
 
@@ -187,7 +187,7 @@ export function useProjectCreation() {
           if (contractorError) {
             console.error(
               "Error fetching contractor profile:",
-              contractorError
+              contractorError,
             );
           } else {
             console.log("Contractor profile fetched:", contractorProfile);
@@ -202,7 +202,7 @@ export function useProjectCreation() {
             if (freelancerError) {
               console.error(
                 "Error fetching freelancer profile:",
-                freelancerError
+                freelancerError,
               );
             } else {
               console.log("Freelancer profile fetched:", freelancerProfile);
@@ -255,13 +255,13 @@ export function useProjectCreation() {
                     totalAmount: data.total_amount,
                     expectedDeliveryDate: data.expected_delivery_date,
                     milestones: data.milestones,
-                  }
+                  },
                 );
 
                 if (contractResult.success) {
                   console.log(
                     "Contract generated successfully:",
-                    contractResult.contractUrl
+                    contractResult.contractUrl,
                   );
 
                   // Update project with contract URL
@@ -273,17 +273,17 @@ export function useProjectCreation() {
                   if (updateError) {
                     console.error(
                       "Error updating project with contract URL:",
-                      updateError
+                      updateError,
                     );
                   } else {
                     console.log(
-                      "Project updated with contract URL successfully"
+                      "Project updated with contract URL successfully",
                     );
                   }
                 } else {
                   console.error(
                     "Error generating contract:",
-                    contractResult.error
+                    contractResult.error,
                   );
                 }
               }
