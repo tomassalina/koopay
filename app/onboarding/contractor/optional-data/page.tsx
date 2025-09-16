@@ -5,25 +5,57 @@ import { ProgressIndicator } from "@/components/progress-indicator";
 import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useOnboardingContext } from "@/lib/contexts/OnboardingContext";
+import { useOnboarding } from "@/lib/hooks/useOnboarding";
 
 export default function ContractorOptionalData() {
   const [description, setDescription] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const router = useRouter();
+  const { contractorData, updateContractorData, clearContractorData } = useOnboardingContext();
+  const { createContractorProfile, isLoading, error } = useOnboarding();
 
-  const handleNext = () => {
-    // TODO: Save optional data and complete onboarding
-    console.log('Optional Data:', { description, logoFile });
-    // For now, redirect to main app
-    router.push('/');
+  const handleNext = async () => {
+    // Update context with optional data
+    updateContractorData({ 
+      description: description || undefined, 
+      logoFile: logoFile || undefined 
+    });
+
+    // Create contractor profile in Supabase
+    const completeData = {
+      ...contractorData,
+      description: description || undefined,
+      logoFile: logoFile || undefined
+    };
+
+    const result = await createContractorProfile(completeData);
+    
+    if (result.success) {
+      clearContractorData();
+      router.push('/');
+    } else {
+      console.error('Error completing onboarding:', result.error);
+    }
   };
 
-  const handleSkip = () => {
-    // TODO: Skip optional data and complete onboarding
-    console.log('Skipping optional data');
-    // For now, redirect to main app
-    router.push('/');
+  const handleSkip = async () => {
+    // Skip optional data but still complete onboarding
+    const completeData = {
+      ...contractorData,
+      description: undefined,
+      logoFile: undefined
+    };
+
+    const result = await createContractorProfile(completeData);
+    
+    if (result.success) {
+      clearContractorData();
+      router.push('/');
+    } else {
+      console.error('Error completing onboarding:', result.error);
+    }
   };
 
   const handleBack = () => {
@@ -100,21 +132,30 @@ export default function ContractorOptionalData() {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="flex justify-end gap-4">
         <Button
           variant="ghost"
           onClick={handleSkip}
-          className="text-white hover:bg-white/10 px-8 py-3 text-lg"
+          disabled={isLoading}
+          className="text-white hover:bg-white/10 px-8 py-3 text-lg disabled:opacity-50"
         >
-          Omitir
+          {isLoading ? 'Procesando...' : 'Omitir'}
         </Button>
         <Button
           onClick={handleNext}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg gap-2"
+          disabled={isLoading}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg gap-2 disabled:opacity-50"
         >
-          Siguiente
-          <ArrowRight className="h-4 w-4" />
+          {isLoading ? 'Procesando...' : 'Siguiente'}
+          {!isLoading && <ArrowRight className="h-4 w-4" />}
         </Button>
       </div>
     </main>

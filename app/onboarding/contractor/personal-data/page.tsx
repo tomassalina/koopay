@@ -6,6 +6,7 @@ import { ProgressIndicator } from "@/components/progress-indicator";
 import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useOnboardingContext } from "@/lib/contexts/OnboardingContext";
 
 export default function ContractorPersonalData() {
   const [companyName, setCompanyName] = useState('');
@@ -15,16 +16,32 @@ export default function ContractorPersonalData() {
   const [website, setWebsite] = useState('');
 
   const router = useRouter();
+  const { contractorData, updateContractorData } = useOnboardingContext();
 
   const handleNext = () => {
-    // TODO: Save personal data and navigate to next step
-    console.log('Personal Data:', { companyName, country, legalAddress, businessId, website });
+    // Save personal data to context
+    const personalData = {
+      country,
+      address: legalAddress,
+      businessId,
+      website: website || undefined,
+      ...(contractorData.contractorType === 'individual' ? {
+        fullName: companyName,
+        individualId: businessId
+      } : {
+        legalName: companyName,
+        displayName: companyName,
+        businessId,
+        website: website || undefined
+      })
+    };
+    
+    updateContractorData(personalData);
     router.push('/onboarding/contractor/optional-data');
   };
 
   const handleSkip = () => {
-    // TODO: Handle skip logic
-    console.log('Skipping personal data');
+    // Skip personal data but still navigate
     router.push('/onboarding/contractor/optional-data');
   };
 
@@ -126,7 +143,8 @@ export default function ContractorPersonalData() {
         </Button>
         <Button
           onClick={handleNext}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg gap-2"
+          disabled={!companyName || !country || !legalAddress || !businessId}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg gap-2 disabled:opacity-50"
         >
           Siguiente
           <ArrowRight className="h-4 w-4" />

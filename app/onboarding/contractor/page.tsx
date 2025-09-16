@@ -6,14 +6,17 @@ import { ProgressIndicator } from "@/components/progress-indicator";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useOnboardingContext } from "@/lib/contexts/OnboardingContext";
 
 export default function ContractorOnboarding() {
   const [contractorType, setContractorType] = useState<'persona-juridica' | 'empresa'>('empresa');
   const router = useRouter();
+  const { updateContractorData } = useOnboardingContext();
 
   const handleNext = () => {
-    // TODO: Save contractor type and navigate to next step
-    console.log('Contractor type:', contractorType);
+    // Save contractor type to context
+    const mappedType = contractorType === 'persona-juridica' ? 'individual' : 'company';
+    updateContractorData({ contractorType: mappedType });
     router.push('/onboarding/contractor/personal-data');
   };
 

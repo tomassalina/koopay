@@ -18,7 +18,7 @@ export default function OnboardingPage() {
     if (selectedRole === 'contractor') {
       router.push('/onboarding/contractor');
     } else if (selectedRole === 'freelancer') {
-      router.push('/onboarding/freelancer');
+      router.push('/onboarding/freelancer/personal-data');
     }
   };
 
