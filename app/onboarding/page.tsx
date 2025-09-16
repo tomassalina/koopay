@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,19 +6,52 @@ import { Check } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 
 export default function OnboardingPage() {
-  const [selectedRole, setSelectedRole] = useState<'freelancer' | 'contractor' | null>(null);
+  const [selectedRole, setSelectedRole] = useState<
+    "freelancer" | "contractor" | null
+  >(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedRole) return;
-    
-    // Navigate to specific onboarding flow based on selected role
-    if (selectedRole === 'contractor') {
-      router.push('/onboarding/contractor');
-    } else if (selectedRole === 'freelancer') {
-      router.push('/onboarding/freelancer/personal-data');
+
+    setIsUpdating(true);
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error("User not authenticated:", userError);
+        return;
+      }
+
+      // Update user metadata with selected role
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { role: selectedRole },
+      });
+
+      if (updateError) {
+        console.error("Error updating user metadata:", updateError);
+        return;
+      }
+
+      // Navigate to specific onboarding flow based on selected role
+      if (selectedRole === "contractor") {
+        router.push("/onboarding/contractor");
+      } else if (selectedRole === "freelancer") {
+        router.push("/onboarding/freelancer/personal-data");
+      }
+    } catch (error) {
+      console.error("Error in handleContinue:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -26,9 +59,9 @@ export default function OnboardingPage() {
     <main className="min-h-screen bg-black flex flex-col items-center justify-center px-6">
       {/* Logo */}
       <div className="mb-12">
-        <Image 
-          src="/logo.svg" 
-          alt="Koopay" 
+        <Image
+          src="/logo.svg"
+          alt="Koopay"
           width={174}
           height={48}
           className="h-12 w-auto"
@@ -43,13 +76,13 @@ export default function OnboardingPage() {
       {/* Role Selection Cards */}
       <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl">
         {/* Freelancer Card */}
-        <Card 
+        <Card
           className={`flex-1 cursor-pointer transition-all duration-300 ${
-            selectedRole === 'freelancer' 
-              ? 'ring-2 ring-blue-500 bg-purple-900/30' 
-              : 'bg-purple-900/20 hover:bg-purple-900/30'
+            selectedRole === "freelancer"
+              ? "ring-2 ring-blue-500 bg-purple-900/30"
+              : "bg-purple-900/20 hover:bg-purple-900/30"
           }`}
-          onClick={() => setSelectedRole('freelancer')}
+          onClick={() => setSelectedRole("freelancer")}
         >
           <CardContent className="p-8 text-center h-80 flex flex-col justify-between">
             {/* Image placeholder area - ready for future image */}
@@ -58,21 +91,21 @@ export default function OnboardingPage() {
                 <span className="text-white/60 text-sm">Image placeholder</span>
               </div>
             </div>
-            
+
             {/* Text content */}
             <div className="space-y-4">
               <p className="text-white text-lg">
                 Soy freelancer y quiero recibir pagos
               </p>
-              <Button 
+              <Button
                 className={`w-full gap-2 ${
-                  selectedRole === 'freelancer'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 text-white'
-                    : 'bg-purple-800 hover:bg-purple-700 text-white'
+                  selectedRole === "freelancer"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 text-white"
+                    : "bg-purple-800 hover:bg-purple-700 text-white"
                 }`}
               >
                 Freelancer
-                {selectedRole === 'freelancer' && (
+                {selectedRole === "freelancer" && (
                   <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
                     <Check className="h-3 w-3 text-white" />
                   </div>
@@ -83,13 +116,13 @@ export default function OnboardingPage() {
         </Card>
 
         {/* Contractor Card */}
-        <Card 
+        <Card
           className={`flex-1 cursor-pointer transition-all duration-300 ${
-            selectedRole === 'contractor' 
-              ? 'ring-2 ring-blue-500 bg-purple-900/30' 
-              : 'bg-purple-900/20 hover:bg-purple-900/30'
+            selectedRole === "contractor"
+              ? "ring-2 ring-blue-500 bg-purple-900/30"
+              : "bg-purple-900/20 hover:bg-purple-900/30"
           }`}
-          onClick={() => setSelectedRole('contractor')}
+          onClick={() => setSelectedRole("contractor")}
         >
           <CardContent className="p-8 text-center h-80 flex flex-col justify-between">
             {/* Image placeholder area - ready for future image */}
@@ -98,21 +131,21 @@ export default function OnboardingPage() {
                 <span className="text-white/60 text-sm">Image placeholder</span>
               </div>
             </div>
-            
+
             {/* Text content */}
             <div className="space-y-4">
               <p className="text-white text-lg">
                 Soy Contratista y quiero enviar pagos
               </p>
-              <Button 
+              <Button
                 className={`w-full gap-2 ${
-                  selectedRole === 'contractor'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 text-white'
-                    : 'bg-purple-800 hover:bg-purple-700 text-white'
+                  selectedRole === "contractor"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 text-white"
+                    : "bg-purple-800 hover:bg-purple-700 text-white"
                 }`}
               >
                 Contratista
-                {selectedRole === 'contractor' && (
+                {selectedRole === "contractor" && (
                   <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
                     <Check className="h-3 w-3 text-white" />
                   </div>
@@ -126,11 +159,12 @@ export default function OnboardingPage() {
       {/* Continue Button - Only show when a role is selected */}
       {selectedRole && (
         <div className="mt-12">
-          <Button 
+          <Button
             onClick={handleContinue}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg"
+            disabled={isUpdating}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 text-lg disabled:opacity-50"
           >
-            Continuar
+            {isUpdating ? "Procesando..." : "Continuar"}
           </Button>
         </div>
       )}
