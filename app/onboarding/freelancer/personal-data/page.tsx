@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,10 @@ import { useRouter } from "next/navigation";
 import { useOnboardingContext } from "@/lib/contexts/OnboardingContext";
 
 export default function FreelancerPersonalData() {
-  const [fullName, setFullName] = useState('');
-  const [dni, setDni] = useState('');
-  const [country, setCountry] = useState('');
-  const [address, setAddress] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [dni, setDni] = useState("");
+  const [country, setCountry] = useState("");
+  const [address, setAddress] = useState("");
 
   const router = useRouter();
   const { updateFreelancerData } = useOnboardingContext();
@@ -23,23 +23,23 @@ export default function FreelancerPersonalData() {
       fullName,
       freelancerId: dni,
       country,
-      address
+      address,
     };
-    
+
     updateFreelancerData(personalData);
-    router.push('/onboarding/freelancer/professional-profile');
+    router.push("/onboarding/freelancer/professional-profile");
   };
 
   const handleBack = () => {
-    router.push('/onboarding');
+    router.push("/onboarding");
   };
 
   return (
     <main className="min-h-screen bg-black flex flex-col px-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-16">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={handleBack}
           className="text-white hover:bg-white/10 gap-2"
         >
@@ -52,11 +52,9 @@ export default function FreelancerPersonalData() {
       {/* Content */}
       <div className="flex-1 flex flex-col justify-start max-w-2xl mx-auto w-full">
         <div className="mb-16">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Datos personales
-          </h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Personal Data</h1>
           <p className="text-white/80 text-lg">
-            Completa tu información personal básica
+            Complete your basic personal information
           </p>
         </div>
 
@@ -64,13 +62,13 @@ export default function FreelancerPersonalData() {
           {/* Full Name */}
           <div>
             <label className="text-white text-sm font-medium mb-2 block">
-              Nombre completo *
+              Full Name *
             </label>
             <Input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Ej: Juan Pérez García"
+              placeholder="E.g: John Smith Garcia"
               className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
             />
           </div>
@@ -92,14 +90,14 @@ export default function FreelancerPersonalData() {
           {/* Country */}
           <div>
             <label className="text-white text-sm font-medium mb-2 block">
-              País *
+              Country *
             </label>
             <div className="relative">
               <Input
                 type="text"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                placeholder="Ej: Colombia"
+                placeholder="E.g: Colombia"
                 className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 pr-10"
               />
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -109,13 +107,13 @@ export default function FreelancerPersonalData() {
           {/* Address */}
           <div>
             <label className="text-white text-sm font-medium mb-2 block">
-              Dirección *
+              Address *
             </label>
             <Input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Ej: Calle 123 #45-67, Bogotá"
+              placeholder="E.g: 123 Main St, New York"
               className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
             />
           </div>
@@ -124,7 +122,7 @@ export default function FreelancerPersonalData() {
 
       {/* Action Buttons */}
       <div className="flex justify-end">
-        <Button 
+        <Button
           onClick={handleNext}
           disabled={!fullName || !dni || !country || !address}
           className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 gap-2 disabled:opacity-50"

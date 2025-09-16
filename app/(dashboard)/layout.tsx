@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
 
@@ -96,7 +97,13 @@ export default function HomeLayout({
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.svg" alt="Koopay" className="h-8 w-auto" />
+              <Image
+                src="/logo.svg"
+                alt="Koopay"
+                className="h-8 w-auto"
+                width={32}
+                height={32}
+              />
             </Link>
 
             <div className="flex items-center gap-4">
@@ -117,10 +124,12 @@ export default function HomeLayout({
               <div className="flex items-center gap-3">
                 <Link href="/profile">
                   <Button variant="default" className="gap-2">
-                    <img
+                    <Image
                       src="/icons/profile-icon.svg"
                       alt="Profile"
                       className="h-4 w-4"
+                      width={16}
+                      height={16}
                     />
                     Go to profile
                   </Button>
@@ -130,10 +139,12 @@ export default function HomeLayout({
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="sm">
-                      <img
+                      <Image
                         src="/icons/notification-icon.svg"
                         alt="Notifications"
                         className="h-4 w-4"
+                        width={16}
+                        height={16}
                       />
                     </Button>
                   </SheetTrigger>
@@ -179,10 +190,12 @@ export default function HomeLayout({
                 </Sheet>
 
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <img
+                  <Image
                     src="/icons/logout-icon.svg"
                     alt="Logout"
                     className="h-4 w-4"
+                    width={16}
+                    height={16}
                   />
                 </Button>
               </div>
@@ -212,10 +225,12 @@ export default function HomeLayout({
                 key={index}
                 className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer border-b border-border last:border-b-0"
               >
-                <img
+                <Image
                   src={user.avatar}
                   alt={user.name}
                   className="w-8 h-8 rounded-full"
+                  width={32}
+                  height={32}
                 />
                 <span className="text-sm font-medium">{user.name}</span>
               </div>

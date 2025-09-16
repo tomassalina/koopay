@@ -1,24 +1,8 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DonutChart } from "@/components/donut-chart";
-import {
-  ArrowRight,
-  Plus,
-  Star,
-  FileText,
-  User,
-  Calendar,
-  ChevronDown,
-  LogIn,
-  User2,
-} from "lucide-react";
+import { Star, User, Calendar } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -45,7 +29,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-3xl">Paytrust Labs</h3>
-                    <p className="text-white/80 text-md">Empresa</p>
+                    <p className="text-white/80 text-md">Company</p>
                   </div>
                 </div>
                 <Link href={"/profile"}>
@@ -100,7 +84,7 @@ export default function Home() {
       {/* Projects Section */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold">Tus Proyectos</h2>
+          <h2 className="text-2xl font-bold">Your Projects</h2>
           <Badge variant="secondary" className="gap-1">
             3
           </Badge>
@@ -123,7 +107,7 @@ export default function Home() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <span>Colaborated with Juan Barcos</span>
+                  <span>Collaborated with Juan Barcos</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -131,7 +115,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4" />
-                  <span>Divide in 5 Milestones</span>
+                  <span>Divided into 5 Milestones</span>
                 </div>
               </div>
               <div className="pt-2 border-t">
@@ -156,7 +140,7 @@ export default function Home() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <span>Colaborated with Micaela Gomez</span>
+                  <span>Collaborated with Micaela Gomez</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -164,7 +148,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4" />
-                  <span>Divide in 23 Milestones</span>
+                  <span>Divided into 23 Milestones</span>
                 </div>
               </div>
               <div className="pt-2 border-t">
@@ -189,7 +173,7 @@ export default function Home() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <span>Colaborated with Juan Barcos</span>
+                  <span>Collaborated with Juan Barcos</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -197,7 +181,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4" />
-                  <span>Divide in 5 Milestones</span>
+                  <span>Divided into 5 Milestones</span>
                 </div>
               </div>
               <div className="pt-2 border-t">

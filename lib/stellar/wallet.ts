@@ -1,5 +1,12 @@
-import { Horizon, Keypair, Networks, TransactionBuilder, Operation } from '@stellar/stellar-sdk';
-import CryptoJS from 'crypto-js';
+import {
+  Horizon,
+  Keypair,
+  Networks,
+  TransactionBuilder,
+  Operation,
+  Asset,
+} from "@stellar/stellar-sdk";
+import CryptoJS from "crypto-js";
 
 export interface StellarWallet {
   publicKey: string;
@@ -17,12 +24,12 @@ export class StellarWalletManager {
   private server: Horizon.Server;
   private network: string;
 
-  constructor(network: 'testnet' | 'mainnet' = 'testnet') {
+  constructor(network: "testnet" | "mainnet" = "testnet") {
     this.network = network;
     this.server = new Horizon.Server(
-      network === 'testnet' 
-        ? 'https://horizon-testnet.stellar.org'
-        : 'https://horizon.stellar.org'
+      network === "testnet"
+        ? "https://horizon-testnet.stellar.org"
+        : "https://horizon.stellar.org"
     );
   }
 
@@ -33,28 +40,31 @@ export class StellarWalletManager {
     // Create deterministic keypair from Google user ID
     const seed = CryptoJS.SHA256(`google:${userId}:${email}`).toString();
     const keypair = Keypair.fromSecret(seed);
-    
+
     return {
       publicKey: keypair.publicKey(),
       secretKey: keypair.secret(),
-      authMethod: 'google',
-      createdAt: Date.now()
+      authMethod: "google",
+      createdAt: Date.now(),
     };
   }
 
   /**
    * Create a deterministic wallet from any identifier
    */
-  createWalletFromIdentifier(identifier: string, authMethod: string): StellarWallet {
+  createWalletFromIdentifier(
+    identifier: string,
+    authMethod: string
+  ): StellarWallet {
     // Create a deterministic seed from the identifier
     const seedData = `${authMethod}:${identifier}`;
     const hash = CryptoJS.SHA256(seedData).toString();
-    
+
     // Convert hash to 32-byte buffer for Ed25519 seed
     // Pad or truncate to exactly 32 bytes
-    const hashBuffer = Buffer.from(hash, 'hex');
+    const hashBuffer = Buffer.from(hash, "hex");
     const seedBuffer = Buffer.alloc(32);
-    
+
     if (hashBuffer.length >= 32) {
       hashBuffer.copy(seedBuffer, 0, 0, 32);
     } else {
@@ -67,14 +77,14 @@ export class StellarWalletManager {
         offset += remaining;
       }
     }
-    
+
     const keypair = Keypair.fromRawEd25519Seed(seedBuffer);
-    
+
     return {
       publicKey: keypair.publicKey(),
       secretKey: keypair.secret(),
       authMethod,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
   }
 
@@ -82,17 +92,22 @@ export class StellarWalletManager {
    * Fund a testnet account using friendbot
    */
   async fundTestnetAccount(publicKey: string): Promise<boolean> {
-    if (this.network !== 'testnet') return false;
+    if (this.network !== "testnet") return false;
 
     try {
-      const response = await fetch(`https://friendbot.stellar.org?addr=${publicKey}`);
+      const response = await fetch(
+        `https://friendbot.stellar.org?addr=${publicKey}`
+      );
       if (!response.ok) {
-        throw new Error('Friendbot funding failed');
+        throw new Error("Friendbot funding failed");
       }
-      console.log('✅ Account funded with testnet XLM');
+      console.log("✅ Account funded with testnet XLM");
       return true;
-    } catch (error: any) {
-      console.warn('⚠️ Friendbot funding failed:', error.message);
+    } catch (error: unknown) {
+      console.warn(
+        "⚠️ Friendbot funding failed:",
+        error instanceof Error ? error.message : "Unknown error"
+      );
       return false;
     }
   }
@@ -104,7 +119,7 @@ export class StellarWalletManager {
     try {
       await this.server.loadAccount(publicKey);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -115,12 +130,15 @@ export class StellarWalletManager {
   async getBalance(publicKey: string): Promise<WalletBalance[]> {
     try {
       const account = await this.server.loadAccount(publicKey);
-      return account.balances.map(balance => ({
-        asset: balance.asset_type === 'native' ? 'XLM' : (balance as any).asset_code || 'Unknown',
-        balance: balance.balance
+      return account.balances.map((balance) => ({
+        asset:
+          balance.asset_type === "native"
+            ? "XLM"
+            : (balance as { asset_code?: string }).asset_code || "Unknown",
+        balance: balance.balance,
       }));
     } catch (error) {
-      console.error('Error fetching balance:', error);
+      console.error("Error fetching balance:", error);
       return [];
     }
   }
@@ -128,20 +146,23 @@ export class StellarWalletManager {
   /**
    * Create and fund a new wallet
    */
-  async createAndFundWallet(identifier: string, authMethod: string): Promise<StellarWallet> {
+  async createAndFundWallet(
+    identifier: string,
+    authMethod: string
+  ): Promise<StellarWallet> {
     const wallet = this.createWalletFromIdentifier(identifier, authMethod);
-    
+
     // Check if account already exists
     const exists = await this.accountExists(wallet.publicKey);
-    
-    if (!exists && this.network === 'testnet') {
+
+    if (!exists && this.network === "testnet") {
       // Fund the account
       await this.fundTestnetAccount(wallet.publicKey);
-      
+
       // Wait a bit for the account to be created
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
-    
+
     return wallet;
   }
 
@@ -152,33 +173,34 @@ export class StellarWalletManager {
     secretKey: string,
     destination: string,
     amount: string,
-    asset: string = 'XLM'
+    asset: string = "XLM"
   ): Promise<string | null> {
     try {
       const keypair = Keypair.fromSecret(secretKey);
       const account = await this.server.loadAccount(keypair.publicKey());
-      
+
       const transaction = new TransactionBuilder(account, {
-        fee: '100',
-        networkPassphrase: this.network === 'testnet' ? Networks.TESTNET : Networks.PUBLIC
+        fee: "100",
+        networkPassphrase:
+          this.network === "testnet" ? Networks.TESTNET : Networks.PUBLIC,
       })
-      .addOperation(
-        Operation.payment({
-          destination,
-          asset: asset === 'XLM' ? new (await import('@stellar/stellar-sdk')).Asset.native() : 
-            new (await import('@stellar/stellar-sdk')).Asset(asset, 'ISSUER'),
-          amount
-        })
-      )
-      .setTimeout(30)
-      .build();
+        .addOperation(
+          Operation.payment({
+            destination,
+            asset:
+              asset === "XLM" ? Asset.native() : new Asset(asset, "ISSUER"),
+            amount,
+          })
+        )
+        .setTimeout(30)
+        .build();
 
       transaction.sign(keypair);
-      
+
       const result = await this.server.submitTransaction(transaction);
       return result.hash;
     } catch (error) {
-      console.error('Payment failed:', error);
+      console.error("Payment failed:", error);
       return null;
     }
   }

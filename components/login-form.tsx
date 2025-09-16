@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { StellarWalletManager } from "@/lib/stellar/wallet";
 
 export function LoginForm({
   className,
@@ -53,10 +52,10 @@ export function LoginForm({
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: 'select_account',
-            access_type: 'offline',
-            include_granted_scopes: 'true'
-          }
+            prompt: "select_account",
+            access_type: "offline",
+            include_granted_scopes: "true",
+          },
         },
       });
       if (error) throw error;

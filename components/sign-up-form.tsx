@@ -3,13 +3,7 @@
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -67,10 +61,10 @@ export function SignUpForm({
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: 'select_account',
-            access_type: 'offline',
-            include_granted_scopes: 'true'
-          }
+            prompt: "select_account",
+            access_type: "offline",
+            include_granted_scopes: "true",
+          },
         },
       });
       if (error) throw error;
@@ -90,7 +84,9 @@ export function SignUpForm({
         }}
       >
         <CardHeader>
-          <CardTitle className="w-72 text-3xl">Let's get started</CardTitle>
+          <CardTitle className="w-72 text-3xl">
+            Let&apos;s get started
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>

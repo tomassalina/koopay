@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,11 @@ import { useRouter } from "next/navigation";
 import { useOnboardingContext } from "@/lib/contexts/OnboardingContext";
 
 export default function ContractorPersonalData() {
-  const [companyName, setCompanyName] = useState('');
-  const [country, setCountry] = useState('');
-  const [legalAddress, setLegalAddress] = useState('');
-  const [businessId, setBusinessId] = useState('');
-  const [website, setWebsite] = useState('');
+  const [companyName, setCompanyName] = useState("");
+  const [country, setCountry] = useState("");
+  const [legalAddress, setLegalAddress] = useState("");
+  const [businessId, setBusinessId] = useState("");
+  const [website, setWebsite] = useState("");
 
   const router = useRouter();
   const { contractorData, updateContractorData } = useOnboardingContext();
@@ -25,28 +25,30 @@ export default function ContractorPersonalData() {
       address: legalAddress,
       businessId,
       website: website || undefined,
-      ...(contractorData.contractorType === 'individual' ? {
-        fullName: companyName,
-        individualId: businessId
-      } : {
-        legalName: companyName,
-        displayName: companyName,
-        businessId,
-        website: website || undefined
-      })
+      ...(contractorData.contractorType === "individual"
+        ? {
+            fullName: companyName,
+            individualId: businessId,
+          }
+        : {
+            legalName: companyName,
+            displayName: companyName,
+            businessId,
+            website: website || undefined,
+          }),
     };
-    
+
     updateContractorData(personalData);
-    router.push('/onboarding/contractor/optional-data');
+    router.push("/onboarding/contractor/optional-data");
   };
 
   const handleSkip = () => {
     // Skip personal data but still navigate
-    router.push('/onboarding/contractor/optional-data');
+    router.push("/onboarding/contractor/optional-data");
   };
 
   const handleBack = () => {
-    router.push('/onboarding/contractor');
+    router.push("/onboarding/contractor");
   };
 
   return (
@@ -85,11 +87,11 @@ export default function ContractorPersonalData() {
             />
           </div>
 
-          {/* País en la que se ubica tu empresa */}
+          {/* Country where your company is located */}
           <div className="relative">
             <Input
               type="text"
-              placeholder="País en la que se ubica tu empresa *"
+              placeholder="Country where your company is located *"
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 rounded-lg p-4 h-auto pr-10"
@@ -97,11 +99,11 @@ export default function ContractorPersonalData() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-blue-500 pointer-events-none" />
           </div>
 
-          {/* Dirección legal */}
+          {/* Legal address */}
           <div>
             <Input
               type="text"
-              placeholder="Dirección legal *"
+              placeholder="Legal address *"
               value={legalAddress}
               onChange={(e) => setLegalAddress(e.target.value)}
               className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 rounded-lg p-4 h-auto"

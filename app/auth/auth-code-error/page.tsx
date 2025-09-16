@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function AuthCodeErrorPage() {
+function AuthCodeErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
@@ -17,13 +18,15 @@ export default function AuthCodeErrorPage() {
           <div className="mx-auto w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
             <AlertCircle className="h-6 w-6 text-red-500" />
           </div>
-          <CardTitle className="text-white text-xl">Error de Autenticación</CardTitle>
+          <CardTitle className="text-white text-xl">
+            Authentication Error
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-white/80 text-center">
-            Hubo un problema con el proceso de autenticación.
+            There was a problem with the authentication process.
           </p>
-          
+
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
               <p className="text-red-400 text-sm font-medium">Error: {error}</p>
@@ -32,31 +35,35 @@ export default function AuthCodeErrorPage() {
               )}
             </div>
           )}
-          
-          <p className="text-white/60 text-sm">
-            Esto puede suceder por:
-          </p>
+
+          <p className="text-white/60 text-sm">This can happen due to:</p>
           <ul className="text-white/60 text-sm space-y-2">
-            <li>• El proceso de login fue interrumpido</li>
-            <li>• Problemas de conexión temporales</li>
-            <li>• Configuración de cookies del navegador</li>
-            <li>• El estado de OAuth se perdió durante la redirección</li>
+            <li>• The login process was interrupted</li>
+            <li>• Temporary connection issues</li>
+            <li>• Browser cookie configuration</li>
+            <li>• OAuth state was lost during redirection</li>
           </ul>
           <div className="pt-4 space-y-3">
             <Button asChild className="w-full">
-              <Link href="/auth/login">
-                Intentar de nuevo
-              </Link>
+              <Link href="/auth/login">Try again</Link>
             </Button>
             <Button variant="outline" asChild className="w-full">
               <Link href="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Volver al inicio
+                Back to home
               </Link>
             </Button>
           </div>
         </CardContent>
       </Card>
     </main>
+  );
+}
+
+export default function AuthCodeErrorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthCodeErrorContent />
+    </Suspense>
   );
 }

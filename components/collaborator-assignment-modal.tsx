@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { createClient } from "@/lib/supabase/client";
 import { Search, User } from "lucide-react";
+import Image from "next/image";
 
 interface Freelancer {
   id: string;
@@ -39,6 +40,37 @@ export function CollaboratorAssignmentModal({
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClient();
 
+  const fetchFreelancers = useCallback(
+    async (searchTerm = "") => {
+      if (searchTerm.trim() === "") return;
+
+      setIsLoading(true);
+      try {
+        const query = supabase
+          .from("freelancer_profiles")
+          .select("id, full_name, position, avatar_url")
+          .ilike("full_name", `%${searchTerm.trim()}%`);
+
+        const { data, error } = await query.limit(20);
+
+        console.log("searchTerm", searchTerm);
+        console.log("data", data);
+
+        if (error) {
+          console.error("Error fetching freelancers:", error);
+          return;
+        }
+
+        setFreelancers(data ?? []);
+      } catch (error) {
+        console.error("Error fetching freelancers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [supabase]
+  );
+
   // Debounce search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -50,41 +82,13 @@ export function CollaboratorAssignmentModal({
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, fetchFreelancers]);
 
   useEffect(() => {
     if (isOpen) {
       fetchFreelancers();
     }
-  }, [isOpen]);
-
-  const fetchFreelancers = async (searchTerm = "") => {
-    if (searchTerm.trim() === "") return;
-
-    setIsLoading(true);
-    try {
-      const query = supabase
-        .from("freelancer_profiles")
-        .select("id, full_name, position, avatar_url")
-        .ilike("full_name", `%${searchTerm.trim()}%`);
-
-      const { data, error } = await query.limit(20);
-
-      console.log("searchTerm", searchTerm);
-      console.log("data", data);
-
-      if (error) {
-        console.error("Error fetching freelancers:", error);
-        return;
-      }
-
-      setFreelancers(data ?? []);
-    } catch (error) {
-      console.error("Error fetching freelancers:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isOpen, fetchFreelancers]);
 
   // No need for local filtering since we're doing it in the database
 
@@ -143,10 +147,12 @@ export function CollaboratorAssignmentModal({
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
                       {freelancer.avatar_url ? (
-                        <img
+                        <Image
                           src={freelancer.avatar_url}
                           alt={freelancer.full_name}
                           className="w-full h-full rounded-full object-cover"
+                          width={40}
+                          height={40}
                         />
                       ) : (
                         <User className="h-5 w-5 text-muted-foreground" />
