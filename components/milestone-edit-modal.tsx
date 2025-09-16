@@ -62,14 +62,15 @@ export function MilestoneEditModal({
   }, [milestone]);
 
   const handleSave = () => {
-    if (!milestone) return;
-
-    const updatedMilestone: Milestone = {
-      ...milestone,
-      ...formData,
+    const milestoneData: Milestone = {
+      id: milestone?.id || "", // Use existing ID or empty string for new milestones
+      title: formData.title,
+      description: formData.description,
+      deadline: formData.deadline,
+      percentage: formData.percentage,
     };
 
-    onSave(updatedMilestone);
+    onSave(milestoneData);
     onClose();
   };
 
@@ -80,10 +81,17 @@ export function MilestoneEditModal({
     }
   };
 
-  const isNewMilestone = !milestone || !milestone.title;
+  const isNewMilestone = !milestone;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[500px] bg-background border-border">
         <DialogHeader>
           <DialogTitle className="text-foreground">

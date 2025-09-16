@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,8 +73,10 @@ export default function CreateProjectPage() {
   };
 
   const handleAddMilestone = () => {
+    console.log("handleAddMilestone called");
     setEditingMilestone(null);
     setIsMilestoneModalOpen(true);
+    console.log("Modal should open for new milestone");
   };
 
   const handleEditMilestone = (id: string) => {
@@ -84,18 +86,26 @@ export default function CreateProjectPage() {
   };
 
   const handleSaveMilestone = (milestone: Milestone) => {
+    console.log("handleSaveMilestone called with:", milestone);
+    console.log("editingMilestone:", editingMilestone);
+    console.log("current milestones:", milestones);
+
     if (editingMilestone) {
       // Update existing milestone
+      console.log("Updating existing milestone");
       setMilestones(
         milestones.map((m) => (m.id === milestone.id ? milestone : m))
       );
     } else {
       // Add new milestone
+      console.log("Adding new milestone");
       const newMilestone = {
         ...milestone,
         id: Date.now().toString(),
       };
+      console.log("New milestone to add:", newMilestone);
       setMilestones([...milestones, newMilestone]);
+      console.log("Milestones after adding:", [...milestones, newMilestone]);
     }
   };
 
