@@ -4,16 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<'freelancer' | 'contractor' | null>(null);
+  const router = useRouter();
 
   const handleContinue = () => {
     if (!selectedRole) return;
     
-    // TODO: Handle navigation based on selected role
-    console.log('Selected role:', selectedRole);
+    // Navigate to specific onboarding flow based on selected role
+    if (selectedRole === 'contractor') {
+      router.push('/onboarding/contractor');
+    } else if (selectedRole === 'freelancer') {
+      router.push('/onboarding/freelancer');
+    }
   };
 
   return (
