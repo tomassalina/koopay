@@ -44,7 +44,7 @@ export function SignUpForm({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/profile`,
+          emailRedirectTo: `${window.location.origin}/onboarding`,
         },
       });
       if (error) throw error;
@@ -66,6 +66,11 @@ export function SignUpForm({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'select_account',
+            access_type: 'offline',
+            include_granted_scopes: 'true'
+          }
         },
       });
       if (error) throw error;

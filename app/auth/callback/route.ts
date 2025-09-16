@@ -6,11 +6,16 @@ import { StellarWalletManager } from "@/lib/stellar/wallet";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get("next") ?? "/";
-  if (!next.startsWith("/")) {
-    // if "next" is not a relative URL, use the default
-    next = "/";
+  const error = searchParams.get("error");
+  const errorDescription = searchParams.get("error_description");
+  
+  // Always redirect to onboarding after successful authentication
+  const next = "/onboarding";
+
+  // Handle OAuth errors
+  if (error) {
+    console.error('OAuth error:', error, errorDescription);
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${error}&error_description=${errorDescription}`);
   }
 
   if (code) {
