@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Check, Calendar, Star, Upload, Search, Bell, LogOut, User } from "lucide-react";
+import { ArrowLeft, Check, Calendar, Upload, Search, Bell, LogOut, User, Settings } from "lucide-react";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useProjectMilestones } from "@/lib/hooks/useProjectMilestones";
-import { MilestonesTimeline } from "@/components/milestones-timeline";
-import { ProjectProgress } from "@/components/project-progress";
+import { CompletedMilestoneIcon } from "@/components/milestone-icons/completed-milestone-icon";
+import { PendingMilestoneIcon } from "@/components/milestone-icons/pending-milestone-icon";
 import Image from "next/image";
 
 export default function ProjectPage() {
@@ -41,6 +41,7 @@ export default function ProjectPage() {
       console.error('Error completing milestone:', error);
     }
   };
+
 
   const getDaysLeft = (dateString: string) => {
     const date = new Date(dateString);
@@ -91,8 +92,9 @@ export default function ProjectPage() {
               />
             </div>
             
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white gap-2">
               <User className="h-4 w-4" />
+              Go to profile
             </Button>
             <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
               <Bell className="h-4 w-4" />
@@ -117,6 +119,7 @@ export default function ProjectPage() {
             Back
           </Button>
 
+
           {/* Project Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Left Panel - Project Details */}
@@ -135,7 +138,7 @@ export default function ProjectPage() {
             </Card>
 
             {/* Right Panel - Current Milestone */}
-            <Card className="bg-gray-900/50 border-gray-700">
+            <Card className="bg-blue-600 border-blue-500">
               <CardContent className="p-8">
                 <h2 className="text-xl font-semibold text-white mb-6">
                   Current milestone:
@@ -144,20 +147,20 @@ export default function ProjectPage() {
                 {currentMilestone ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <Star className="h-5 w-5 text-blue-500" />
+                      <Settings className="h-5 w-5 text-white" />
                       <span className="text-white text-lg">{currentMilestone.title}</span>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 text-gray-500" />
+                      <Calendar className="h-5 w-5 text-white/80" />
                       <span className="text-white/80">Deadline: {new Date(project.expected_delivery_date).toLocaleDateString('es-ES')}</span>
                     </div>
 
                     <div className="flex gap-4 mt-6">
-                      <Badge className="bg-blue-500 text-white">
+                      <Badge className="bg-white/20 text-white border-white/30">
                         Receive for this milestone: {currentMilestone.percentage}%
                       </Badge>
-                      <Badge className="bg-blue-500 text-white">
+                      <Badge className="bg-white/20 text-white border-white/30">
                         {getDaysLeft(project.expected_delivery_date)} days left
                       </Badge>
                     </div>
@@ -168,12 +171,12 @@ export default function ProjectPage() {
                           type="checkbox"
                           checked={milestoneCompleted}
                           onChange={(e) => setMilestoneCompleted(e.target.checked)}
-                          className="w-4 h-4 text-blue-500 bg-gray-800 border-gray-600 rounded focus:ring-blue-500"
+                          className="w-4 h-4 text-blue-500 bg-white/20 border-white/30 rounded focus:ring-blue-500"
                         />
                         <span className="text-white">Marcar hito como completado</span>
                       </label>
                       
-                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white gap-2">
+                      <Button className="w-full bg-white text-blue-600 hover:bg-white/90 gap-2">
                         <Upload className="h-4 w-4" />
                         Subir evidencia
                       </Button>
@@ -191,11 +194,72 @@ export default function ProjectPage() {
           {/* Milestones Timeline */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white mb-6">Milestones</h2>
-            <MilestonesTimeline milestones={milestones} totalAmount={project.total_amount} />
+            
+            {milestones.length === 0 ? (
+              /* No milestones - Show message */
+              <Card className="bg-gray-900/50 border-gray-700">
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-white mb-4">
+                      Este proyecto no tiene milestones
+                    </h3>
+                    <p className="text-white/80">
+                      Los milestones deben ser creados al momento de crear el proyecto.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              /* Has milestones - Show timeline */
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute top-8 left-8 right-8 h-0.5 bg-gray-600"></div>
+                
+                {/* Milestones */}
+                <div className="flex justify-between items-start">
+                  {milestones.map((milestone) => (
+                    <div key={milestone.id} className="flex flex-col items-center relative z-10">
+                      {/* Milestone icon */}
+                      <div className="w-16 h-16 mb-4">
+                        {milestone.status === 'completed' ? (
+                          <CompletedMilestoneIcon id={`completed-${milestone.id}`} />
+                        ) : (
+                          <PendingMilestoneIcon />
+                        )}
+                      </div>
+                      
+                      {/* Milestone title and amount */}
+                      <div className="text-center max-w-32">
+                        <h3 className="text-white text-sm font-medium mb-2 leading-tight">
+                          {milestone.title}
+                        </h3>
+                        <p className="text-blue-400 text-sm font-semibold">
+                          ${Math.round(project.total_amount * (milestone.percentage / 100)).toLocaleString()} USD
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
+
           {/* Project Progress */}
-          <ProjectProgress milestones={milestones} />
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-white text-lg">Progreso del proyecto:</span>
+              <div className="flex-1 bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${milestones.length > 0 ? (milestones.filter(m => m.status === 'completed').length / milestones.length) * 100 : 0}%` }}
+                ></div>
+              </div>
+              <span className="text-white text-lg">
+                {milestones.length > 0 ? Math.round((milestones.filter(m => m.status === 'completed').length / milestones.length) * 100) : 0}%
+              </span>
+            </div>
+          </div>
 
           {/* Save Changes Button */}
           <div className="flex justify-end">
