@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
@@ -9,7 +9,7 @@ interface Milestone {
   title: string;
   description: string | null;
   percentage: number;
-  status: 'pending' | 'in_progress' | 'completed';
+  status: "pending" | "in_progress" | "completed";
   created_at: string;
   updated_at: string;
 }
@@ -23,7 +23,8 @@ interface Project {
   image_url: string | null;
   total_amount: number;
   expected_delivery_date: string;
-  status: 'draft' | 'active' | 'completed' | 'cancelled';
+  status: "draft" | "active" | "completed" | "cancelled";
+  contract_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,38 +39,39 @@ export function useProjectMilestones(projectId: string) {
   useEffect(() => {
     const fetchData = async () => {
       if (!projectId) return;
-      
+
       setLoading(true);
       setError(null);
 
       try {
         const [projectResult, milestonesResult] = await Promise.all([
+          supabase.from("projects").select("*").eq("id", projectId).single(),
           supabase
-            .from('projects')
-            .select('*')
-            .eq('id', projectId)
-            .single(),
-          supabase
-            .from('milestones')
-            .select('*')
-            .eq('project_id', projectId)
-            .order('created_at', { ascending: true })
+            .from("milestones")
+            .select("*")
+            .eq("project_id", projectId)
+            .order("created_at", { ascending: true }),
         ]);
 
         if (projectResult.error) {
-          throw new Error(`Error fetching project: ${projectResult.error.message}`);
+          throw new Error(
+            `Error fetching project: ${projectResult.error.message}`
+          );
         }
 
         if (milestonesResult.error) {
-          throw new Error(`Error fetching milestones: ${milestonesResult.error.message}`);
+          throw new Error(
+            `Error fetching milestones: ${milestonesResult.error.message}`
+          );
         }
 
         setProject(projectResult.data);
         setMilestones(milestonesResult.data || []);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
         setError(errorMessage);
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -83,9 +85,9 @@ export function useProjectMilestones(projectId: string) {
 
     try {
       const { data, error: projectError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', projectId)
+        .from("projects")
+        .select("*")
+        .eq("id", projectId)
         .single();
 
       if (projectError) {
@@ -95,9 +97,10 @@ export function useProjectMilestones(projectId: string) {
       setProject(data);
       return data;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('Error fetching project:', error);
+      console.error("Error fetching project:", error);
       return null;
     }
   };
@@ -107,21 +110,24 @@ export function useProjectMilestones(projectId: string) {
 
     try {
       const { data, error: milestonesError } = await supabase
-        .from('milestones')
-        .select('*')
-        .eq('project_id', projectId)
-        .order('created_at', { ascending: true });
+        .from("milestones")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: true });
 
       if (milestonesError) {
-        throw new Error(`Error fetching milestones: ${milestonesError.message}`);
+        throw new Error(
+          `Error fetching milestones: ${milestonesError.message}`
+        );
       }
 
       setMilestones(data || []);
       return data || [];
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('Error fetching milestones:', error);
+      console.error("Error fetching milestones:", error);
       return [];
     }
   };
@@ -133,21 +139,24 @@ export function useProjectMilestones(projectId: string) {
     try {
       await Promise.all([fetchProject(), fetchMilestones()]);
     } catch (error) {
-      console.error('Error fetching all data:', error);
+      console.error("Error fetching all data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateMilestoneStatus = async (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => {
+  const updateMilestoneStatus = async (
+    milestoneId: string,
+    status: "pending" | "in_progress" | "completed"
+  ) => {
     setLoading(true);
     setError(null);
 
     try {
       const { data, error } = await supabase
-        .from('milestones')
+        .from("milestones")
         .update({ status })
-        .eq('id', milestoneId)
+        .eq("id", milestoneId)
         .select()
         .single();
 
@@ -156,17 +165,18 @@ export function useProjectMilestones(projectId: string) {
       }
 
       // Update local state
-      setMilestones(prev => 
-        prev.map(milestone => 
+      setMilestones((prev) =>
+        prev.map((milestone) =>
           milestone.id === milestoneId ? { ...milestone, status } : milestone
         )
       );
 
       return data;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('Error updating milestone:', error);
+      console.error("Error updating milestone:", error);
       return null;
     } finally {
       setLoading(false);
@@ -183,13 +193,13 @@ export function useProjectMilestones(projectId: string) {
 
     try {
       const { data, error } = await supabase
-        .from('milestones')
+        .from("milestones")
         .insert({
           project_id: projectId,
           title: milestoneData.title,
           description: milestoneData.description || null,
           percentage: milestoneData.percentage,
-          status: 'pending'
+          status: "pending",
         })
         .select()
         .single();
@@ -199,13 +209,14 @@ export function useProjectMilestones(projectId: string) {
       }
 
       // Update local state
-      setMilestones(prev => [...prev, data]);
+      setMilestones((prev) => [...prev, data]);
 
       return data;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('Error creating milestone:', error);
+      console.error("Error creating milestone:", error);
       return null;
     } finally {
       setLoading(false);
@@ -213,14 +224,18 @@ export function useProjectMilestones(projectId: string) {
   };
 
   const getCurrentMilestone = () => {
-    return milestones.find(m => m.status === 'in_progress') || 
-           milestones.find(m => m.status === 'pending') || 
-           null;
+    return (
+      milestones.find((m) => m.status === "in_progress") ||
+      milestones.find((m) => m.status === "pending") ||
+      null
+    );
   };
 
   const calculateProgress = () => {
     if (!milestones.length) return 0;
-    const completedMilestones = milestones.filter(m => m.status === 'completed');
+    const completedMilestones = milestones.filter(
+      (m) => m.status === "completed"
+    );
     return Math.round((completedMilestones.length / milestones.length) * 100);
   };
 
@@ -240,6 +255,6 @@ export function useProjectMilestones(projectId: string) {
     createMilestone,
     getCurrentMilestone,
     calculateProgress,
-    getMilestoneAmount
+    getMilestoneAmount,
   };
 }

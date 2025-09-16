@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,17 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import {
-  ArrowLeft,
-  Plus,
-  Check,
-  Edit,
-  Search,
-  User,
-  Bell,
-  LogOut,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { ArrowLeft, Plus, Check, Edit, User } from "lucide-react";
 import { useProjectCreation } from "@/lib/hooks/useProjectCreation";
 import { MilestoneEditModal } from "@/components/milestone-edit-modal";
 import { CollaboratorAssignmentModal } from "@/components/collaborator-assignment-modal";
@@ -33,7 +23,6 @@ interface Milestone {
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const supabase = createClient();
   const { createProject, isLoading, error } = useProjectCreation();
 
   // Project form state
@@ -64,7 +53,7 @@ export default function CreateProjectPage() {
       description:
         "Create the wireframes and high quality mockup design of the hero section...",
       deadline: "2025-05-14",
-      percentage: 20,
+      percentage: 50,
     },
   ]);
 
@@ -159,13 +148,9 @@ export default function CreateProjectPage() {
 
     console.log("Project creation result:", result);
 
-    if (result.success) {
-      router.push("/");
+    if (result.success && result.project) {
+      router.push(`/projects/${result.project.id}`);
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `$${amount.toLocaleString()} USD`;
   };
 
   const formatDate = (dateString: string) => {

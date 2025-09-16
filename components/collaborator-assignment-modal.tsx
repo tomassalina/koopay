@@ -63,7 +63,7 @@ export function CollaboratorAssignmentModal({
 
     setIsLoading(true);
     try {
-      let query = supabase
+      const query = supabase
         .from("freelancer_profiles")
         .select("id, full_name, position, avatar_url")
         .ilike("full_name", `%${searchTerm.trim()}%`);

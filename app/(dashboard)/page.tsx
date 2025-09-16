@@ -80,7 +80,7 @@ export default function Home() {
                 </div>
                 <div>
                   <Image
-                    src="/icons/create-project.png"
+                    src="/icons/create-project.svg"
                     alt="Document icons"
                     width={160}
                     height={100}

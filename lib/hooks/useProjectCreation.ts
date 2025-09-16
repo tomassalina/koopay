@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import { useContractGeneration } from "./useContractGeneration";
 
 interface MilestoneData {
   title: string;
@@ -23,6 +24,7 @@ export function useProjectCreation() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+  const { generateContract } = useContractGeneration();
 
   const createProject = async (data: ProjectData) => {
     setIsLoading(true);
@@ -167,6 +169,132 @@ export function useProjectCreation() {
       }
 
       console.log("Project creation completed successfully");
+
+      // Generate contract if freelancer is assigned
+      if (data.freelancer_id) {
+        console.log("Generating contract for project...");
+        console.log("Freelancer ID:", data.freelancer_id);
+
+        try {
+          // Get contractor profile data
+          const { data: contractorProfile, error: contractorError } =
+            await supabase
+              .from("contractor_profiles")
+              .select("*")
+              .eq("id", user.id)
+              .single();
+
+          if (contractorError) {
+            console.error(
+              "Error fetching contractor profile:",
+              contractorError
+            );
+          } else {
+            console.log("Contractor profile fetched:", contractorProfile);
+            // Get freelancer profile data
+            const { data: freelancerProfile, error: freelancerError } =
+              await supabase
+                .from("freelancer_profiles")
+                .select("*")
+                .eq("id", data.freelancer_id)
+                .single();
+
+            if (freelancerError) {
+              console.error(
+                "Error fetching freelancer profile:",
+                freelancerError
+              );
+            } else {
+              console.log("Freelancer profile fetched:", freelancerProfile);
+              // Get contractor email from profiles table
+              const { data: contractorEmail } = await supabase
+                .from("profiles")
+                .select("email")
+                .eq("id", user.id)
+                .single();
+
+              // Get freelancer email from profiles table
+              const { data: freelancerEmail } = await supabase
+                .from("profiles")
+                .select("email")
+                .eq("id", data.freelancer_id)
+                .single();
+
+              if (
+                contractorProfile &&
+                freelancerProfile &&
+                contractorEmail &&
+                freelancerEmail
+              ) {
+                console.log("All data available, generating contract...");
+                console.log("Contractor email:", contractorEmail.email);
+                console.log("Freelancer email:", freelancerEmail.email);
+
+                const contractResult = await generateContract(
+                  {
+                    fullName: contractorProfile.full_name,
+                    legalName: contractorProfile.legal_name,
+                    displayName: contractorProfile.display_name,
+                    individualId: contractorProfile.individual_id,
+                    businessId: contractorProfile.business_id,
+                    country: contractorProfile.country,
+                    address: contractorProfile.address,
+                    email: contractorEmail.email,
+                  },
+                  {
+                    fullName: freelancerProfile.full_name,
+                    freelancerId: freelancerProfile.freelancer_id,
+                    country: freelancerProfile.country,
+                    address: freelancerProfile.address,
+                    email: freelancerEmail.email,
+                  },
+                  {
+                    id: project.id,
+                    title: data.title,
+                    description: data.description,
+                    totalAmount: data.total_amount,
+                    expectedDeliveryDate: data.expected_delivery_date,
+                    milestones: data.milestones,
+                  }
+                );
+
+                if (contractResult.success) {
+                  console.log(
+                    "Contract generated successfully:",
+                    contractResult.contractUrl
+                  );
+
+                  // Update project with contract URL
+                  const { error: updateError } = await supabase
+                    .from("projects")
+                    .update({ contract_url: contractResult.contractUrl })
+                    .eq("id", project.id);
+
+                  if (updateError) {
+                    console.error(
+                      "Error updating project with contract URL:",
+                      updateError
+                    );
+                  } else {
+                    console.log(
+                      "Project updated with contract URL successfully"
+                    );
+                  }
+                } else {
+                  console.error(
+                    "Error generating contract:",
+                    contractResult.error
+                  );
+                }
+              }
+            }
+          }
+        } catch (contractError) {
+          console.error("Error in contract generation process:", contractError);
+          // Don't fail the project creation if contract generation fails
+        }
+      }
+
       return { success: true, project };
     } catch (error) {
       const errorMessage =
